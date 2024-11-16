@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: test
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/tripmark_testdb
+    username: sa
+    password:
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.tripmark.platform.domain
