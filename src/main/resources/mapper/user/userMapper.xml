@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tripmark.domain.user.repository.UserMapper">
+  <!-- 이메일로 사용자 조회 -->
+  <insert id="insertUser">
+    INSERT INTO users (email, username, password, current_points, created_at, updated_at)
+    VALUES (#{email}, #{username}, #{password}, #{currentPoints}, NOW(), NOW())
+  </insert>
+
+  <!-- 사용자 삽입 -->
+  <select id="findByEmail" resultType="com.tripmark.domain.user.model.User">
+    SELECT user_id        AS userId,
+           email,
+           username,
+           password,
+           current_points AS currentPoints,
+           created_at     AS createdAt,
+           updated_at     AS updatedAt
+    FROM users
+    WHERE email = #{email}
+  </select>
+
+</mapper>
