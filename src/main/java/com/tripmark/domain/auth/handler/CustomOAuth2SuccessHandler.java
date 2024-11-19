@@ -30,12 +30,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     String email = oAuth2User.getAttribute("email");
 
     Optional<User> userOptional = userMapper.findByEmail(email);
-    
-    if (userOptional.isEmpty()) {
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.getWriter().write("유저를 찾을 수 없습니다.");
-      return;
-    }
 
     User user = userOptional.get();
     String accessToken = jwtUtil.generateToken(user.getEmail());
@@ -44,8 +38,5 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
     response.getWriter().write("{\"accessToken\": \"" + accessToken + "\", \"refreshToken\": \"" + refreshToken + "\"}");
-
-
   }
-
 }

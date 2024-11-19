@@ -1,6 +1,7 @@
 package com.tripmark.common.config;
 
 import com.tripmark.domain.auth.handler.CustomOAuth2SuccessHandler;
+import com.tripmark.domain.auth.handler.CustomOauth2FailureHandler;
 import com.tripmark.domain.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ public class SecurityConfig {
 
   private final CustomOAuth2UserService customOAuth2UserService;
   private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+  private final CustomOauth2FailureHandler customOauth2FailureHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,7 +30,7 @@ public class SecurityConfig {
                 .userService(customOAuth2UserService)
             )
             .successHandler(customOAuth2SuccessHandler)
-            .failureUrl("/api/auth/failure")
+            .failureHandler(customOauth2FailureHandler)
         );
     
     return http.build();
