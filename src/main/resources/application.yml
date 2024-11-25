@@ -4,7 +4,25 @@ spring:
     url: jdbc:mysql://localhost:3306/trip_mark?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope:
+              - email
+              - profile
 
 mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
+  mapper-locations: classpath:mapper/user/*.xml
   type-aliases-package: com.tripmark.domain
+
+logging:
+  level:
+    root: info
+    org.mybatis: debug
+    org.apache.ibatis: debug
+    com.tripmark: debug

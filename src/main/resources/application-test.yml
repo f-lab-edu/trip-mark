@@ -1,12 +1,19 @@
 spring:
-  profiles:
-    active: test
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/tripmark_testdb
+    url: jdbc:h2:~/tripmark_testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
     username: sa
     password:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.tripmark.platform.domain
+  type-aliases-package: com.tripmark.domain
+logging:
+  level:
+    org.mybatis: debug
+    com.tripmark: debug
