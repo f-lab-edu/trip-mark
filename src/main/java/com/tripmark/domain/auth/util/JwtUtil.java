@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-  private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60;
-  private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24;
+  private static final long ACCESS_TOKEN_VALIDITY_1_HOURS = 1000 * 60 * 60;
+  private static final long REFRESH_TOKEN_VALIDITY_24_HOURS = 1000 * 60 * 60 * 24;
   private final Key key;
 
   private JwtUtil(@Value("${GOOGLE_CLIENT_SECRET}") String secretKey) {
@@ -24,7 +24,7 @@ public class JwtUtil {
     return Jwts.builder()
         .setSubject(email)
         .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
+        .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_1_HOURS))
         .signWith(key)
         .compact();
   }
@@ -33,7 +33,7 @@ public class JwtUtil {
     return Jwts.builder()
         .setSubject(email)
         .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
+        .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_24_HOURS))
         .signWith(key)
         .compact();
   }
@@ -46,7 +46,7 @@ public class JwtUtil {
         .getBody();
   }
 
-  public boolean valdateToken(String token) {
+  public boolean validateToken(String token) {
     try {
       parseToken(token);
       return true;
@@ -54,5 +54,4 @@ public class JwtUtil {
       return false;
     }
   }
-
 }

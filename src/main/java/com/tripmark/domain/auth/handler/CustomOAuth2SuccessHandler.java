@@ -1,12 +1,10 @@
 package com.tripmark.domain.auth.handler;
 
 import com.tripmark.domain.auth.util.JwtUtil;
-import com.tripmark.domain.user.model.User;
 import com.tripmark.domain.user.repository.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -29,11 +27,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
     String email = oAuth2User.getAttribute("email");
 
-    Optional<User> userOptional = userMapper.findByEmail(email);
-
-    User user = userOptional.get();
-    String accessToken = jwtUtil.generateToken(user.getEmail());
-    String refreshToken = jwtUtil.generatedRefreshToken(user.getEmail());
+    String accessToken = jwtUtil.generateToken(email);
+    String refreshToken = jwtUtil.generatedRefreshToken(email);
 
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");

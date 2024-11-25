@@ -1,6 +1,5 @@
 package com.tripmark.domain.auth.service;
 
-import com.tripmark.domain.auth.model.OAuth2UserInfoDto;
 import com.tripmark.domain.user.model.User;
 import com.tripmark.domain.user.repository.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +21,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     String email = oAuth2User.getAttribute("email");
     String provider = userRequest.getClientRegistration().getRegistrationId();
 
-    OAuth2UserInfoDto userInfoDto = new OAuth2UserInfoDto(email, provider);
-
     User user = userMapper.findByEmail(email).orElseGet(() -> {
-      User newUser = new User();
-      newUser.setEmail(userInfoDto.email());
-      newUser.setUsername("");
-      newUser.setPassword("");
-      newUser.setCurrentPoints(0);
+      User newUser = User.builder()
+          .email(email)
+          .username("")
+          .password("")
+          .currentPoints(0)
+          .build();
       userMapper.insertUser(newUser);
       return newUser;
     });
