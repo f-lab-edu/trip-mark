@@ -28,7 +28,7 @@ class JwtUtilTest {
     // Then: JWT 파싱 및 검증
     Claims claims = jwtUtil.parseToken(token);
     assertEquals(email, claims.getSubject());
-    assertTrue(jwtUtil.valdateToken(token));
+    assertTrue(jwtUtil.validateToken(token));
   }
 
   @Test
@@ -37,6 +37,6 @@ class JwtUtilTest {
     String invalidToken = "invalid.jwt.token";
 
     // Then: 토큰 검증 실패
-    assertFalse(jwtUtil.valdateToken(invalidToken));
+    assertFalse(jwtUtil.validateToken(invalidToken));
   }
 }
