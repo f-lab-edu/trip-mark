@@ -1,4 +1,4 @@
-package com.tripmark.common.config;
+package com.tripmark.global.config;
 
 import com.tripmark.domain.auth.handler.CustomOAuth2SuccessHandler;
 import com.tripmark.domain.auth.handler.CustomOauth2FailureHandler;
