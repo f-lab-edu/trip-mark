@@ -47,8 +47,8 @@ class UserServiceTest {
     assertNotNull(responseDto);
     assertNotNull(responseDto.accessToken());
     assertNotNull(responseDto.refreshToken());
-    assertTrue(jwtUtil.valdateToken(responseDto.accessToken()));
-    assertTrue(jwtUtil.valdateToken(responseDto.refreshToken()));
+    assertTrue(jwtUtil.validateToken(responseDto.accessToken()));
+    assertTrue(jwtUtil.validateToken(responseDto.refreshToken()));
     assertEquals(requestDto.email(), jwtUtil.parseToken(responseDto.accessToken()).getSubject());
 
     // 데이터베이스에 유저가 저장되었는지 확인

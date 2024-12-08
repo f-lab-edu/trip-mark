@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tripmark.domain.location.repository.CountryMapper">
+  <select id="findById" resultType="com.tripmark.domain.location.model.Country">
+    SELECT country_id   AS countryId,
+           continent_id AS continentId,
+           name
+    FROM countries
+    WHERE country_id = #{countryId}
+  </select>
+</mapper>
