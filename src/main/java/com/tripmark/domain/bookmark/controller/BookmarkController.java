@@ -4,6 +4,8 @@ import com.tripmark.domain.bookmark.dto.BookmarkRequestDto;
 import com.tripmark.domain.bookmark.dto.BookmarkResponseDto;
 import com.tripmark.domain.bookmark.service.BookmarkService;
 import com.tripmark.global.common.RestResponse;
+import com.tripmark.global.common.ResultCase;
+import com.tripmark.global.exception.GlobalException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +28,13 @@ public class BookmarkController {
       @Valid @RequestBody BookmarkRequestDto requestDto,
       @AuthenticationPrincipal OAuth2User principal) {
 
+    if (principal == null) {
+      throw new GlobalException(ResultCase.LOGIN_REQUIRED);
+    }
+
     String email = principal.getAttribute("email");
     BookmarkResponseDto responseDto = bookmarkService.createBookmark(requestDto, email);
-    
+
     return RestResponse.success(responseDto);
   }
 }
