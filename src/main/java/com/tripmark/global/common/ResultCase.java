@@ -22,7 +22,11 @@ public enum ResultCase {
   EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, 1007, "만료된 Refresh Token"),
 
   // 데이터 유효성 및 입력 오류
-  INVALID_INPUT(HttpStatus.BAD_REQUEST, 2001, "유효하지 않은 입력값입니다.");
+  INVALID_INPUT(HttpStatus.BAD_REQUEST, 2001, "유효하지 않은 입력값입니다."),
+
+  // 북마크 관련
+  BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, 3001, "북마크를 찾을 수 없습니다."),
+  BOOKMARK_FORBIDDEN(HttpStatus.FORBIDDEN, 3002, "북마크에 접근할 권한이 없습니다.");
 
   private final HttpStatus httpStatus;
   private final int code;

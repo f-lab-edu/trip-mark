@@ -59,4 +59,34 @@ public class BookmarkService {
         .createdAt(bookmark.getCreatedAt())
         .build();
   }
+
+  public BookmarkResponseDto getBookmark(Long bookmarkId, String email) {
+    User user = userMapper.findByEmail(email)
+        .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
+
+    Bookmark bookmark = bookmarkMapper.findById(bookmarkId)
+        .orElseThrow(() -> new GlobalException(ResultCase.BOOKMARK_NOT_FOUND));
+
+    if (!BookmarkStatus.APPROVED.equals(bookmark.getStatus()) && !bookmark.getUserId().equals(user.getUserId())) {
+      throw new GlobalException(ResultCase.BOOKMARK_NOT_FOUND);
+    }
+
+    bookmarkMapper.incrementViewCount(bookmarkId);
+
+    City city = cityMapper.findById(bookmark.getCityId())
+        .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+
+    return BookmarkResponseDto.builder()
+        .bookmarkId(bookmark.getBookmarkId())
+        .title(bookmark.getTitle())
+        .description(bookmark.getDescription())
+        .url(bookmark.getUrl())
+        .status(bookmark.getStatus().name().toLowerCase())
+        .cityName(city.getName())
+        .pointsRequired(bookmark.getPointsRequired())
+        .viewCount(bookmark.getViewCount())
+        .recommendationCount(bookmark.getRecommendationCount())
+        .createdAt(bookmark.getCreatedAt())
+        .build();
+  }
 }

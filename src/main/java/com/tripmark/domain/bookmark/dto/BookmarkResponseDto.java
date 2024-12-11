@@ -15,6 +15,8 @@ public record BookmarkResponseDto(
     String cityName,
     Integer pointsRequired,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    Integer viewCount,
+    Integer recommendationCount,
     LocalDateTime createdAt
 ) {
 
