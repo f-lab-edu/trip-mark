@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,17 @@ public class BookmarkController {
 
     String email = principal.getAttribute("email");
     BookmarkResponseDto responseDto = bookmarkService.createBookmark(requestDto, email);
+
+    return RestResponse.success(responseDto);
+  }
+
+  @GetMapping("/{bookmarkId}")
+  public ResponseEntity<RestResponse<BookmarkResponseDto>> getBookmark(
+      @PathVariable Long bookmarkId,
+      @AuthenticationPrincipal OAuth2User principal) {
+
+    String email = principal.getAttribute("email");
+    BookmarkResponseDto responseDto = bookmarkService.getBookmark(bookmarkId, email);
 
     return RestResponse.success(responseDto);
   }

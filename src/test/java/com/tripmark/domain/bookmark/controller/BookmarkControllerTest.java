@@ -1,8 +1,11 @@
 package com.tripmark.domain.bookmark.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,13 +15,14 @@ import com.tripmark.domain.bookmark.dto.BookmarkRequestDto;
 import com.tripmark.domain.bookmark.dto.BookmarkResponseDto;
 import com.tripmark.domain.bookmark.model.BookmarkStatus;
 import com.tripmark.domain.bookmark.service.BookmarkService;
+import com.tripmark.global.common.ResultCase;
+import com.tripmark.global.exception.GlobalException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -31,7 +35,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(BookmarkController.class)
-@AutoConfigureMockMvc(addFilters = false)
+//@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class BookmarkControllerTest {
 
@@ -46,14 +50,14 @@ class BookmarkControllerTest {
 
   @BeforeEach
   public void setUp() {
-//    // Mock OAuth2User
-//    Map<String, Object> attributes = Map.of("email", "user@example.com");
-//    OAuth2User principal = new DefaultOAuth2User(Collections.emptyList(), attributes, "email");
-//
-//    // Mock Authentication
-//    OAuth2AuthenticationToken authentication = new OAuth2AuthenticationToken(principal, null, "google");
-//    SecurityContextHolder.getContext().setAuthentication(authentication);
-    SecurityContextHolder.clearContext(); // SecurityContext 초기화
+    // Mock OAuth2User
+    Map<String, Object> attributes = Map.of("email", "user@example.com");
+    OAuth2User principal = new DefaultOAuth2User(Collections.emptyList(), attributes, "email");
+
+    // Mock Authentication
+    OAuth2AuthenticationToken authentication = new OAuth2AuthenticationToken(principal, null, "google");
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+//    SecurityContextHolder.clearContext(); // SecurityContext 초기화
 
   }
 
@@ -163,4 +167,68 @@ class BookmarkControllerTest {
         .andExpect(jsonPath("$.message").value("로그인이 필요합니다."));
   }
 
+  @Test
+  public void testGetBookMark_Success() throws Exception {
+
+    //given
+    BookmarkResponseDto responseDto = BookmarkResponseDto.builder()
+        .bookmarkId(1L)
+        .title("북마크 제목")
+        .description("설명")
+        .url("http://map.google")
+        .status(BookmarkStatus.PENDING.name().toLowerCase())
+        .cityName("서울")
+        .pointsRequired(100)
+        .createdAt(LocalDateTime.now())
+        .viewCount(15)
+        .recommendationCount(5)
+        .build();
+
+    when(bookmarkService.getBookmark(anyLong(), any(String.class)))
+        .thenReturn(responseDto);
+
+    Map<String, Object> attributes = Map.of("email", "user@example.com");
+    OAuth2User principal = new DefaultOAuth2User(Collections.emptyList(), attributes, "email");
+    Authentication authentication = new OAuth2AuthenticationToken(principal, null, "google");
+
+    //when & then
+    mockMvc.perform(get("/api/bookmarks/1")
+            .with(authentication(authentication))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.bookmarkId").value(1))
+        .andExpect(jsonPath("$.data.title").value("북마크 제목"))
+        .andExpect(jsonPath("$.data.description").value("설명"))
+        .andExpect(jsonPath("$.data.url").value("http://map.google"))
+        .andExpect(jsonPath("$.data.status").value("pending"))
+        .andExpect(jsonPath("$.data.cityName").value("서울"))
+        .andExpect(jsonPath("$.data.pointsRequired").value(100))
+        .andExpect(jsonPath("$.data.viewCount").value(15))
+        .andExpect(jsonPath("$.data.recommendationCount").value(5))
+        .andExpect(jsonPath("$.data.createdAt").exists());
+  }
+
+  @Test
+  public void testGetBookmark_NotFound() throws Exception {
+    //given
+    Long nonExistentBookmarkId = 999L;
+
+    // 북마크가 없을 경우 GlobalException이 발생하도록 설정
+    when(bookmarkService.getBookmark(eq(nonExistentBookmarkId), any(String.class)))
+        .thenThrow(new GlobalException(ResultCase.BOOKMARK_NOT_FOUND));
+
+    Map<String, Object> attributes = Map.of("email", "user@example.com");
+    OAuth2User principal = new DefaultOAuth2User(Collections.emptyList(), attributes, "email");
+    Authentication authentication = new OAuth2AuthenticationToken(principal, null, "google");
+
+    //when & then
+    mockMvc.perform(get("/api/bookmarks/" + nonExistentBookmarkId)
+            .with(authentication(authentication))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+        .andExpect(jsonPath("$.code").value(3001))
+        .andExpect(jsonPath("$.message").value("북마크를 찾을 수 없습니다."))
+        .andExpect(jsonPath("$.data").isEmpty());
+  }
 }
