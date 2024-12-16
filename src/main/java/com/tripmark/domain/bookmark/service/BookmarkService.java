@@ -89,4 +89,38 @@ public class BookmarkService {
         .createdAt(bookmark.getCreatedAt())
         .build();
   }
+
+  public BookmarkResponseDto updateBookmark(Long bookmarkId, BookmarkRequestDto requestDto, String email) {
+    User user = userMapper.findByEmail(email)
+        .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
+
+    Bookmark bookmark = bookmarkMapper.findById(bookmarkId)
+        .orElseThrow(() -> new GlobalException(ResultCase.BOOKMARK_NOT_FOUND));
+
+    if (!bookmark.getUserId().equals(user.getUserId())) {
+      throw new GlobalException(ResultCase.BOOKMARK_FORBIDDEN);
+    }
+
+    City city = cityMapper.findById(requestDto.cityId())
+        .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+
+    bookmark.setTitle(requestDto.title());
+    bookmark.setDescription(requestDto.description());
+    bookmark.setUrl(requestDto.url());
+    bookmark.setCityId(requestDto.cityId());
+    bookmark.setPointsRequired(requestDto.pointsRequired());
+    bookmark.setStatus(BookmarkStatus.PENDING);
+    bookmarkMapper.updateBookmark(bookmark);
+
+    return BookmarkResponseDto.builder()
+        .bookmarkId(bookmark.getBookmarkId())
+        .title(bookmark.getTitle())
+        .description(bookmark.getDescription())
+        .url(bookmark.getUrl())
+        .status(bookmark.getStatus().name().toLowerCase())
+        .cityName(city.getName())
+        .pointsRequired(bookmark.getPointsRequired())
+        .createdAt(bookmark.getCreatedAt())
+        .build();
+  }
 }
