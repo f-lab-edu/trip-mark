@@ -58,4 +58,16 @@ public interface BookmarkMapper {
       WHERE bookmark_id = #{bookmarkId}
       """)
   void incrementViewCount(Long bookmarkId);
+
+  @Update("""
+      UPDATE bookmarks
+      SET title = #{title},
+          description = #{description},
+          url = #{url},
+          city_id = #{cityId},
+          points_required = #{pointsRequired},
+          status = #{status}
+      WHERE bookmark_id = #{bookmarkId}
+      """)
+  void updateBookmark(Bookmark bookmark);
 }

@@ -16,7 +16,7 @@ public record BookmarkRequestDto(
     @NotNull(message = "대륙 ID는 필수 입력 사항입니다.")
     Long continentId,
 
-    @NotNull
+    @NotNull(message = "국가 ID는 필수 입력 사항입니다.")
     Long countryId,
 
     @NotNull(message = "도시 ID는 필수 입력 사항입니다.")
