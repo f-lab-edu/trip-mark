@@ -3,8 +3,11 @@ package com.tripmark.domain.bookmark.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -60,8 +63,8 @@ class BookmarkControllerTest {
     // Mock Authentication
     OAuth2AuthenticationToken authentication = new OAuth2AuthenticationToken(principal, null, "google");
     SecurityContextHolder.getContext().setAuthentication(authentication);
-//    SecurityContextHolder.clearContext(); // SecurityContext 초기화
 
+//  SecurityContextHolder.clearContext(); // SecurityContext 초기화
   }
 
   @Test
@@ -361,5 +364,60 @@ class BookmarkControllerTest {
             "URL은 필수 입력 사항입니다.",
             "대륙 ID는 필수 입력 사항입니다."
         )));
+  }
+
+  @Test
+  @DisplayName("4.1: 북마크 소유자가 북마크를 성공적으로 삭제한다.")
+  public void testDeleteBookmark_Success() throws Exception {
+    //given
+    doNothing().when(bookmarkService).deleteBookmark(anyLong(), any(String.class));
+    //when & then
+    mockMvc.perform(delete("/api/bookmarks/1")
+            .with(authentication(SecurityContextHolder.getContext().getAuthentication())))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("OK"))
+        .andExpect(jsonPath("$.code").value(0))
+        .andExpect(jsonPath("$.message").value("정상 처리되었습니다."));
+  }
+
+  @Test
+  @DisplayName("4.2: 존재하지 않는 북마크를 삭제한다.")
+  public void testDeleteBookmark_NotFound() throws Exception {
+    //given
+    doThrow(new GlobalException(ResultCase.BOOKMARK_NOT_FOUND))
+        .when(bookmarkService).deleteBookmark(anyLong(), any(String.class));
+    //when & then
+    mockMvc.perform(delete("/api/bookmarks/999")
+            .with(authentication(SecurityContextHolder.getContext().getAuthentication())))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.status").value("NOT_FOUND"))
+        .andExpect(jsonPath("$.code").value(3001))
+        .andExpect(jsonPath("$.message").value("북마크를 찾을 수 없습니다."));
+  }
+
+  @Test
+  @DisplayName("4.3: 북마크 소유자가 아닌 사용자가 삭제를 시도한다.")
+  public void testDeleteBookmark_Forbidden() throws Exception {
+    //given
+    doThrow(new GlobalException(ResultCase.BOOKMARK_FORBIDDEN))
+        .when(bookmarkService).deleteBookmark(anyLong(), any(String.class));
+    //when & then
+    mockMvc.perform(delete("/api/bookmarks/1")
+            .with(authentication(SecurityContextHolder.getContext().getAuthentication())))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.status").value("FORBIDDEN"))
+        .andExpect(jsonPath("$.code").value(3002))
+        .andExpect(jsonPath("$.message").value("북마크에 접근할 권한이 없습니다."));
+  }
+
+  @Test
+  @DisplayName("4.4: 인증되지 않은 사용자가 북마크 삭제를 시도한다.")
+  public void testDeleteBookmark_Unauthorized() throws Exception {
+    //when & then
+    mockMvc.perform(delete("/api/bookmarks/1"))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.status").value("UNAUTHORIZED"))
+        .andExpect(jsonPath("$.code").value(1005))
+        .andExpect(jsonPath("$.message").value("로그인이 필요합니다."));
   }
 }

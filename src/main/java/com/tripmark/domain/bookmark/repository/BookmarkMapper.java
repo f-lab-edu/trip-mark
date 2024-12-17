@@ -2,6 +2,7 @@ package com.tripmark.domain.bookmark.repository;
 
 import com.tripmark.domain.bookmark.model.Bookmark;
 import java.util.Optional;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -70,4 +71,10 @@ public interface BookmarkMapper {
       WHERE bookmark_id = #{bookmarkId}
       """)
   void updateBookmark(Bookmark bookmark);
+
+  @Delete("""
+      DELETE FROM bookmarks
+      WHERE bookmark_id = #{bookmarkId}
+      """)
+  void deleteBookmark(Long bookmarkId);
 }

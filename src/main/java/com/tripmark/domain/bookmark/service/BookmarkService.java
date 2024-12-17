@@ -29,8 +29,7 @@ public class BookmarkService {
   public BookmarkResponseDto createBookmark(
       BookmarkRequestDto requestDto,
       String email) {
-    User user = userMapper.findByEmail(email)
-        .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
+    User user = validateUser(email);
 
     Long cityId = requestDto.cityId();
     City city = cityMapper.findById(cityId)
@@ -61,11 +60,9 @@ public class BookmarkService {
   }
 
   public BookmarkResponseDto getBookmark(Long bookmarkId, String email) {
-    User user = userMapper.findByEmail(email)
-        .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
+    User user = validateUser(email);
 
-    Bookmark bookmark = bookmarkMapper.findById(bookmarkId)
-        .orElseThrow(() -> new GlobalException(ResultCase.BOOKMARK_NOT_FOUND));
+    Bookmark bookmark = validateBookmark(bookmarkId);
 
     if (!BookmarkStatus.APPROVED.equals(bookmark.getStatus()) && !bookmark.getUserId().equals(user.getUserId())) {
       throw new GlobalException(ResultCase.BOOKMARK_NOT_FOUND);
@@ -91,11 +88,9 @@ public class BookmarkService {
   }
 
   public BookmarkResponseDto updateBookmark(Long bookmarkId, BookmarkRequestDto requestDto, String email) {
-    User user = userMapper.findByEmail(email)
-        .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
+    User user = validateUser(email);
 
-    Bookmark bookmark = bookmarkMapper.findById(bookmarkId)
-        .orElseThrow(() -> new GlobalException(ResultCase.BOOKMARK_NOT_FOUND));
+    Bookmark bookmark = validateBookmark(bookmarkId);
 
     if (!bookmark.getUserId().equals(user.getUserId())) {
       throw new GlobalException(ResultCase.BOOKMARK_FORBIDDEN);
@@ -122,5 +117,27 @@ public class BookmarkService {
         .pointsRequired(bookmark.getPointsRequired())
         .createdAt(bookmark.getCreatedAt())
         .build();
+  }
+
+  public void deleteBookmark(Long bookmarkId, String email) {
+    User user = validateUser(email);
+
+    Bookmark bookmark = validateBookmark(bookmarkId);
+
+    if (!bookmark.getUserId().equals(user.getUserId())) {
+      throw new GlobalException(ResultCase.BOOKMARK_FORBIDDEN);
+    }
+
+    bookmarkMapper.deleteBookmark(bookmarkId);
+  }
+
+  private Bookmark validateBookmark(Long bookmarkId) {
+    return bookmarkMapper.findById(bookmarkId)
+        .orElseThrow(() -> new GlobalException(ResultCase.BOOKMARK_NOT_FOUND));
+  }
+
+  private User validateUser(String email) {
+    return userMapper.findByEmail(email)
+        .orElseThrow(() -> new GlobalException(ResultCase.USER_NOT_FOUND));
   }
 }
