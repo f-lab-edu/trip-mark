@@ -1,6 +1,7 @@
 package com.tripmark.domain.bookmark.repository;
 
 import com.tripmark.domain.bookmark.model.Bookmark;
+import java.util.List;
 import java.util.Optional;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -52,6 +53,22 @@ public interface BookmarkMapper {
          WHERE bookmark_id = #{bookmarkId}
       """)
   Optional<Bookmark> findById(Long bookmarkId);
+
+  @Select("""
+         SELECT bookmark_id AS bookmarkId,
+                user_id AS userId,
+                city_id AS cityId,
+                title,
+                description,
+                url,
+                points_required AS pointsRequired,
+                view_count AS viewCount,
+                recommendation_count AS recommendationCount,
+                status,
+                created_at AS createdAt
+         FROM bookmarks
+      """)
+  List<Bookmark> findAll();
 
   @Update("""
       UPDATE bookmarks
