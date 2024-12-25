@@ -4,6 +4,11 @@ spring:
     url: jdbc:mysql://localhost:3306/trip_mark?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+
+  sql:
+    init:
+      data-locations: classpath:init.sql
+      mode: always
   security:
     oauth2:
       client:
@@ -15,6 +20,9 @@ spring:
             scope:
               - email
               - profile
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
 
 mybatis:
   mapper-locations: classpath:mapper/user/*.xml
