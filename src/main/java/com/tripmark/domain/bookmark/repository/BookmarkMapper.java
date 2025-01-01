@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.data.repository.query.Param;
 
 @Mapper
 public interface BookmarkMapper {
@@ -66,7 +67,7 @@ public interface BookmarkMapper {
                 recommendation_count AS recommendationCount,
                 status,
                 created_at AS createdAt
-         FROM bookmarks
+         FROM bookmarks WHERE status = 'APPROVED'
       """)
   List<Bookmark> findAll();
 
@@ -88,6 +89,13 @@ public interface BookmarkMapper {
       WHERE bookmark_id = #{bookmarkId}
       """)
   void updateBookmark(Bookmark bookmark);
+
+  @Update("""
+      UPDATE bookmarks
+      SET status = #{status}
+      WHERE bookmark_id = #{bookmarkId}
+      """)
+  void updateStatus(@Param("bookmarkId") Long bookmarkId, @Param("status") String status);
 
   @Delete("""
       DELETE FROM bookmarks
