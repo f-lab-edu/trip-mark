@@ -2,6 +2,7 @@ package com.tripmark.domain.bookmark.controller;
 
 import com.tripmark.domain.bookmark.dto.BookmarkRequestDto;
 import com.tripmark.domain.bookmark.dto.BookmarkResponseDto;
+import com.tripmark.domain.bookmark.dto.UpdateStatusRequestDto;
 import com.tripmark.domain.bookmark.service.BookmarkService;
 import com.tripmark.global.common.RestResponse;
 import com.tripmark.global.common.ResultCase;
@@ -13,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,8 +30,7 @@ public class BookmarkController {
   private final BookmarkService bookmarkService;
 
   @PostMapping
-  public ResponseEntity<RestResponse<BookmarkResponseDto>> createBookmark(
-      @Valid @RequestBody BookmarkRequestDto requestDto,
+  public ResponseEntity<RestResponse<BookmarkResponseDto>> createBookmark(@Valid @RequestBody BookmarkRequestDto requestDto,
       @AuthenticationPrincipal OAuth2User principal) {
 
     if (principal == null) {
@@ -43,9 +44,7 @@ public class BookmarkController {
   }
 
   @GetMapping("/{bookmarkId}")
-  public ResponseEntity<RestResponse<BookmarkResponseDto>> getBookmark(
-      @PathVariable Long bookmarkId,
-      @AuthenticationPrincipal OAuth2User principal) {
+  public ResponseEntity<RestResponse<BookmarkResponseDto>> getBookmark(@PathVariable Long bookmarkId, @AuthenticationPrincipal OAuth2User principal) {
 
     String email = principal.getAttribute("email");
     BookmarkResponseDto responseDto = bookmarkService.getBookmark(bookmarkId, email);
@@ -54,9 +53,7 @@ public class BookmarkController {
   }
 
   @PutMapping("/{bookmarkId}")
-  public ResponseEntity<RestResponse<BookmarkResponseDto>> updateBookmark(
-      @PathVariable Long bookmarkId,
-      @Valid @RequestBody BookmarkRequestDto requestDto,
+  public ResponseEntity<RestResponse<BookmarkResponseDto>> updateBookmark(@PathVariable Long bookmarkId, @Valid @RequestBody BookmarkRequestDto requestDto,
       @AuthenticationPrincipal OAuth2User principal) {
 
     String email = principal.getAttribute("email");
@@ -66,9 +63,7 @@ public class BookmarkController {
   }
 
   @DeleteMapping("/{bookmarkId}")
-  public ResponseEntity<RestResponse<String>> deleteBookmark(
-      @PathVariable Long bookmarkId,
-      @AuthenticationPrincipal OAuth2User principal) {
+  public ResponseEntity<RestResponse<String>> deleteBookmark(@PathVariable Long bookmarkId, @AuthenticationPrincipal OAuth2User principal) {
     if (principal == null) {
       throw new GlobalException(ResultCase.LOGIN_REQUIRED);
     }
@@ -77,5 +72,11 @@ public class BookmarkController {
     bookmarkService.deleteBookmark(bookmarkId, email);
 
     return RestResponse.success("북마크가 삭제되었습니다.");
+  }
+
+  @PatchMapping("/{id}/status")
+  public ResponseEntity<RestResponse<String>> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequestDto request) {
+    bookmarkService.updateBookmarkStatus(id, request.status());
+    return RestResponse.success("북마크 상태가 변경되었습니다.");
   }
 }
