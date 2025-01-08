@@ -1,6 +1,7 @@
 package com.tripmark.domain.location.repository;
 
 import com.tripmark.domain.location.model.Country;
+import java.util.List;
 import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -12,4 +13,13 @@ public interface CountryMapper {
       + "FROM countries "
       + "WHERE country_id = #{countryId}")
   Optional<Country> findById(Long countryId);
+
+  @Select("""
+      SELECT country_id AS countryId,
+             continent_id AS continentId,
+             name
+        FROM countries
+      WHERE continent_id = #{continentId}
+      """)
+  List<Country> findByContinentId(Long continentId);
 }
