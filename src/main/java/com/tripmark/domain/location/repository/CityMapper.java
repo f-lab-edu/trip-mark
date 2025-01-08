@@ -1,6 +1,7 @@
 package com.tripmark.domain.location.repository;
 
 import com.tripmark.domain.location.model.City;
+import java.util.List;
 import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -12,4 +13,13 @@ public interface CityMapper {
       + "FROM cities "
       + "WHERE city_id = #{cityId}")
   Optional<City> findById(Long cityId);
+
+  @Select("""
+      SELECT city_id AS cityId,
+             country_id AS countryId,
+             name
+        FROM cities
+      WHERE country_id = #{countryId}
+      """)
+  List<City> findByCountryId(Long countryId);
 }
