@@ -74,9 +74,9 @@ public class BookmarkController {
     return RestResponse.success("북마크가 삭제되었습니다.");
   }
 
-  @PatchMapping("/{id}/status")
-  public ResponseEntity<RestResponse<String>> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequestDto request) {
-    bookmarkService.updateBookmarkStatus(id, request.status());
+  @PatchMapping("/{bookmarkId}/status")
+  public ResponseEntity<RestResponse<String>> updateStatus(@PathVariable Long bookmarkId, @RequestBody UpdateStatusRequestDto request) {
+    bookmarkService.updateBookmarkStatus(bookmarkId, request.status());
     return RestResponse.success("북마크 상태가 변경되었습니다.");
   }
 }
