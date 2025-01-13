@@ -16,7 +16,6 @@ public class PointHistory {
 
   private Long pointId;
   private Long userId;
-  private Long bookmarkId;
   private Integer amount;
   private PointType type;
   private String source;
