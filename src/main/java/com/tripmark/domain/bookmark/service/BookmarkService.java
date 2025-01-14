@@ -35,14 +35,28 @@ public class BookmarkService {
     Long cityId = requestDto.cityId();
     City city = cityMapper.findById(cityId).orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
 
-    Bookmark bookmark = Bookmark.builder().userId(user.getUserId()).title(requestDto.title()).description(requestDto.description()).url(requestDto.url())
-        .pointsRequired(requestDto.pointsRequired()).cityId(requestDto.cityId()).status(BookmarkStatus.PENDING).build();
+    Bookmark bookmark = Bookmark.builder()
+            .userId(user.getUserId())
+            .title(requestDto.title())
+            .description(requestDto.description())
+            .url(requestDto.url())
+            .pointsRequired(requestDto.pointsRequired())
+            .cityId(requestDto.cityId())
+            .status(BookmarkStatus.PENDING)
+            .build();
 
     bookmarkMapper.insertBookmark(bookmark);
 
-    return BookmarkResponseDto.builder().bookmarkId(bookmark.getBookmarkId()).title(bookmark.getTitle()).description(bookmark.getDescription())
-        .url(bookmark.getUrl()).status(bookmark.getStatus().name().toLowerCase()).cityName(city.getName()).pointsRequired(bookmark.getPointsRequired())
-        .createdAt(bookmark.getCreatedAt()).build();
+    return BookmarkResponseDto.builder()
+            .bookmarkId(bookmark.getBookmarkId())
+            .title(bookmark.getTitle())
+            .description(bookmark.getDescription())
+            .url(bookmark.getUrl())
+            .status(bookmark.getStatus().name().toLowerCase())
+            .cityName(city.getName())
+            .pointsRequired(bookmark.getPointsRequired())
+            .createdAt(bookmark.getCreatedAt())
+            .build();
   }
 
   public BookmarkResponseDto getBookmark(Long bookmarkId, String email) {
@@ -56,11 +70,21 @@ public class BookmarkService {
 
     bookmarkMapper.incrementViewCount(bookmarkId);
 
-    City city = cityMapper.findById(bookmark.getCityId()).orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+    City city = cityMapper.findById(bookmark.getCityId())
+            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
 
-    return BookmarkResponseDto.builder().bookmarkId(bookmark.getBookmarkId()).title(bookmark.getTitle()).description(bookmark.getDescription())
-        .url(bookmark.getUrl()).status(bookmark.getStatus().name().toLowerCase()).cityName(city.getName()).pointsRequired(bookmark.getPointsRequired())
-        .viewCount(bookmark.getViewCount()).recommendationCount(bookmark.getRecommendationCount()).createdAt(bookmark.getCreatedAt()).build();
+    return BookmarkResponseDto.builder()
+            .bookmarkId(bookmark.getBookmarkId())
+            .title(bookmark.getTitle())
+            .description(bookmark.getDescription())
+            .url(bookmark.getUrl())
+            .status(bookmark.getStatus().name().toLowerCase())
+            .cityName(city.getName())
+            .pointsRequired(bookmark.getPointsRequired())
+            .viewCount(bookmark.getViewCount())
+            .recommendationCount(bookmark.getRecommendationCount())
+            .createdAt(bookmark.getCreatedAt())
+            .build();
   }
 
   public BookmarkResponseDto updateBookmark(Long bookmarkId, BookmarkRequestDto requestDto, String email) {
@@ -72,7 +96,8 @@ public class BookmarkService {
       throw new GlobalException(ResultCase.BOOKMARK_FORBIDDEN);
     }
 
-    City city = cityMapper.findById(requestDto.cityId()).orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
+    City city = cityMapper.findById(requestDto.cityId())
+            .orElseThrow(() -> new GlobalException(ResultCase.INVALID_INPUT));
 
     bookmark.setTitle(requestDto.title());
     bookmark.setDescription(requestDto.description());
@@ -82,9 +107,16 @@ public class BookmarkService {
     bookmark.setStatus(BookmarkStatus.PENDING);
     bookmarkMapper.updateBookmark(bookmark);
 
-    return BookmarkResponseDto.builder().bookmarkId(bookmark.getBookmarkId()).title(bookmark.getTitle()).description(bookmark.getDescription())
-        .url(bookmark.getUrl()).status(bookmark.getStatus().name().toLowerCase()).cityName(city.getName()).pointsRequired(bookmark.getPointsRequired())
-        .createdAt(bookmark.getCreatedAt()).build();
+    return BookmarkResponseDto.builder()
+            .bookmarkId(bookmark.getBookmarkId())
+            .title(bookmark.getTitle())
+            .description(bookmark.getDescription())
+            .url(bookmark.getUrl())
+            .status(bookmark.getStatus().name().toLowerCase())
+            .cityName(city.getName())
+            .pointsRequired(bookmark.getPointsRequired())
+            .createdAt(bookmark.getCreatedAt())
+            .build();
   }
 
   public void deleteBookmark(Long bookmarkId, String email) {
@@ -106,7 +138,8 @@ public class BookmarkService {
 
     bookmarkMapper.updateStatus(bookmarkId, newStatus);
 
-    kafkaProducerService.sendMessage("bookmark-status-update", String.format("{\"bookmarkId\": %d, \"status\": \"%s\"}", bookmarkId, newStatus));
+    kafkaProducerService.sendMessage("bookmark-status-update",
+            String.format("{\"bookmarkId\": %d, \"status\": \"%s\"}", bookmarkId, newStatus));
   }
 
   private Bookmark validateBookmark(Long bookmarkId) {
