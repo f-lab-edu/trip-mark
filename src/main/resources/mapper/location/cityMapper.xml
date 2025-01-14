@@ -4,11 +4,22 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.tripmark.domain.location.repository.CityMapper">
-  <select id="findById" resultType="com.tripmark.domain.location.model.City">
+
+  <select id="findById" parameterType="long" resultType="com.tripmark.domain.location.model.City">
     SELECT city_id    AS cityId,
            country_id AS countryId,
            name
     FROM cities
     WHERE city_id = #{cityId}
   </select>
+
+  <select id="findByCountryId" parameterType="long"
+    resultType="com.tripmark.domain.location.model.City">
+    SELECT city_id    AS cityId,
+           country_id AS countryId,
+           name
+    FROM cities
+    WHERE country_id = #{countryId}
+  </select>
+
 </mapper>
