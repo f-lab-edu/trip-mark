@@ -26,7 +26,10 @@ public enum ResultCase {
 
   // 북마크 관련
   BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, 3001, "북마크를 찾을 수 없습니다."),
-  BOOKMARK_FORBIDDEN(HttpStatus.FORBIDDEN, 3002, "북마크에 접근할 권한이 없습니다.");
+  BOOKMARK_FORBIDDEN(HttpStatus.FORBIDDEN, 3002, "북마크에 접근할 권한이 없습니다."),
+
+  // 포인트 관련
+  POINT_NOT_ENOUGH(HttpStatus.CONFLICT, 4001, "포인트가 부족합니다.");
 
   private final HttpStatus httpStatus;
   private final int code;
