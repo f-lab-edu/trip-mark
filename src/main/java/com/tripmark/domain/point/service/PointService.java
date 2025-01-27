@@ -5,6 +5,7 @@ import com.tripmark.domain.point.dto.PointResponseDto;
 import com.tripmark.domain.point.model.PointHistory;
 import com.tripmark.domain.point.model.PointType;
 import com.tripmark.domain.point.repository.PointHistoryRepository;
+import com.tripmark.domain.user.repository.UserMapper;
 import com.tripmark.global.common.ResultCase;
 import com.tripmark.global.exception.GlobalException;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PointService {
 
   private final PointHistoryRepository pointHistoryRepository;
+  private final UserMapper userMapper;
 
   @Transactional
   public void addPoints(Long userId, int amount, String source) {
@@ -32,6 +34,9 @@ public class PointService {
             .build();
 
     pointHistoryRepository.save(pointHistory);
+
+    int updatedPoints = pointHistoryRepository.findTotalPointsByUserId(userId);
+    userMapper.updateCurrentPoints(userId, updatedPoints);
 
     log.info("포인트 적립: userId={}, amount={}, source={}", userId, amount, source);
   }
@@ -54,6 +59,9 @@ public class PointService {
             .build();
 
     pointHistoryRepository.save(pointHistory);
+
+    int updatedPoints = currentPoints - amount;
+    userMapper.updateCurrentPoints(userId, updatedPoints);
 
     log.info("포인트 차감: userId={}, amount={}, source={}", userId, amount, source);
   }
