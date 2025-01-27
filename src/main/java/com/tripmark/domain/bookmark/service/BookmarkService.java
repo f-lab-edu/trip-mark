@@ -142,6 +142,11 @@ public class BookmarkService {
             String.format("{\"bookmarkId\": %d, \"status\": \"%s\"}", bookmarkId, newStatus));
   }
 
+  public Bookmark getBookmarkEntity(Long bookmarkId) {
+    return validateBookmark(bookmarkId);
+  }
+
+
   private Bookmark validateBookmark(Long bookmarkId) {
     return bookmarkMapper.findById(bookmarkId).orElseThrow(() -> new GlobalException(ResultCase.BOOKMARK_NOT_FOUND));
   }
