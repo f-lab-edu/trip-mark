@@ -23,4 +23,11 @@
     WHERE email = #{email}
   </select>
 
+  <!-- 유저의 현재 포인트 갱신 -->
+  <update id="updateCurrentPoints">
+    UPDATE users
+    SET current_points = #{currentPoints}
+    WHERE user_id = #{userId}
+  </update>
+
 </mapper>
