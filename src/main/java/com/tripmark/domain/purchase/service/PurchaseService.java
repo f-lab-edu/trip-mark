@@ -10,6 +10,8 @@ import com.tripmark.domain.purchase.repository.BookmarkPurchaseRepository;
 import com.tripmark.global.common.ResultCase;
 import com.tripmark.global.exception.GlobalException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,5 +50,25 @@ public class PurchaseService {
             bookmark.getStatus().name(),
             purchase.getPurchaseAt()
     );
+  }
+
+  @Transactional(readOnly = true)
+  public List<PurchaseResponseDto> findPurchaseByUserId(Long userId) {
+    List<BookmarkPurchase> purchases = purchaseRepository.findByUserId(userId);
+
+    if (purchases.isEmpty()) {
+      throw new GlobalException(ResultCase.BOOKMARK_NOT_FOUND);
+    }
+    return purchases.stream().map(purchase -> {
+      Bookmark bookmark = bookmarkService.getBookmarkEntity(purchase.getBookmarkId());
+      return new PurchaseResponseDto(
+              bookmark.getBookmarkId(),
+              bookmark.getTitle(),
+              bookmark.getUrl(),
+              bookmark.getPointsRequired(),
+              bookmark.getStatus().name(),
+              purchase.getPurchaseAt()
+      );
+    }).collect(Collectors.toList());
   }
 }
